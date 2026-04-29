@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everyone is John</title>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --surface: #16213e;
+      --surface2: #1a1a2e;
+      --surface3: #0f3460;
+      --accent: #e94560;
+      --accent2: #f5a623;
+      --accent3: #7b2d8b;
+      --text: #e8e8f0;
+      --text-dim: #8888aa;
+      --success: #4caf50;
+      --failure: #e94560;
+      --border: #2a2a4a;
+      --active-glow: #f5a623;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
+
+    .screen {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
+
+    /* ── Header ── */
+    .app-header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+    .app-header h1 {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .app-header p {
+      color: var(--text-dim);
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      color: var(--accent2);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #ff5a75; }
+    .btn-secondary { background: var(--surface3); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: #1a4a7a; }
+    .btn-warning { background: var(--accent2); color: #000; }
+    .btn-warning:hover:not(:disabled) { background: #ffc03d; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover:not(:disabled) { background: #66bb6a; }
+    .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--text-dim); }
+    .btn-danger { background: #b71c1c; color: #fff; }
+    .btn-danger:hover:not(:disabled) { background: #c62828; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+    .btn-lg { padding: 0.9rem 2rem; font-size: 1.1rem; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+    .form-group input[type="number"] { -moz-appearance: textfield; }
+    .form-group input[type="number"]::-webkit-outer-spin-button,
+    .form-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    /* ── Willpower display ── */
+    .wp-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .wp-display .wp-value { color: var(--accent2); }
+    .wp-display .wp-label { font-size: 0.85rem; color: var(--text-dim); font-weight: 400; }
+
+    /* ── Player cards ── */
+    .player-list { display: grid; gap: 0.75rem; }
+    .player-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .player-card.active {
+      border-color: var(--active-glow);
+      box-shadow: 0 0 12px rgba(245,166,35,0.3);
+    }
+    .player-card.ready { border-left: 3px solid var(--success); }
+    .player-card.not-ready { border-left: 3px solid var(--border); }
+    .player-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .player-info { flex: 1; min-width: 0; }
+    .player-name { font-weight: 600; }
+    .player-meta { font-size: 0.8rem; color: var(--text-dim); }
+    .player-wp {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent2);
+      min-width: 2.5rem;
+      text-align: right;
+    }
+    .player-actions { display: flex; gap: 0.4rem; align-items: center; }
+
+    /* ── Active voice banner ── */
+    .active-voice-banner {
+      background: linear-gradient(135deg, rgba(245,166,35,0.15) 0%, rgba(123,45,139,0.15) 100%);
+      border: 1px solid var(--active-glow);
+      border-radius: 10px;
+      padding: 0.8rem 1.2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .active-voice-banner .label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .active-voice-banner .name { font-size: 1.4rem; font-weight: 700; color: var(--active-glow); }
+
+    /* ── Bidding ── */
+    .bidding-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .bidding-modal {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+    .bidding-modal h2 { color: var(--accent); margin-bottom: 0.5rem; }
+    .bidding-modal .reason { color: var(--text-dim); font-style: italic; margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+    .bid-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .bid-input-row input {
+      width: 80px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--surface2);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem;
+    }
+    .bid-stepper {
+      display: flex;
+      gap: 0.4rem;
+      flex-direction: column;
+    }
+    .bid-stepper button {
+      width: 36px;
+      height: 30px;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .bid-stepper button:hover { background: var(--accent); }
+
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .reveal-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem;
+      text-align: center;
+      animation: popIn 0.4s ease;
+    }
+    .reveal-card.winner {
+      border-color: var(--active-glow);
+      box-shadow: 0 0 10px rgba(245,166,35,0.4);
+    }
+    .reveal-card .bid-amount { font-size: 1.8rem; font-weight: 700; color: var(--accent2); }
+    .reveal-card .bid-name { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ── Dice roller ── */
+    .dice-section { text-align: center; }
+    .dice-face {
+      font-size: 4rem;
+      display: inline-block;
+      animation: rollDice 0.5s ease;
+    }
+    @keyframes rollDice {
+      0% { transform: rotate(0deg) scale(0.5); opacity: 0; }
+      60% { transform: rotate(720deg) scale(1.2); }
+      100% { transform: rotate(720deg) scale(1); opacity: 1; }
+    }
+    .dice-result { margin: 1rem 0; }
+    .dice-result .result-label {
+      font-size: 1.3rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .dice-result .result-label.success { background: rgba(76,175,80,0.2); color: var(--success); border: 1px solid var(--success); }
+    .dice-result .result-label.failure { background: rgba(233,69,96,0.2); color: var(--failure); border: 1px solid var(--failure); }
+
+    /* ── Game log ── */
+    .game-log {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 180px;
+      overflow-y: auto;
+      padding: 0.75rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    .log-entry {
+      padding: 0.2rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      animation: fadeIn 0.3s ease;
+    }
+    .log-entry.event { color: var(--accent2); }
+    .log-entry.success { color: var(--success); }
+    .log-entry.failure { color: var(--failure); }
+    .log-entry.reveal { color: #9c7cff; }
+    .log-entry.active { color: var(--active-glow); }
+    .log-entry.end { color: var(--accent); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+
+    /* ── Room code display ── */
+    .room-code {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--accent2);
+      background: var(--surface2);
+      border: 2px dashed var(--accent2);
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      display: inline-block;
+      cursor: pointer;
+      user-select: all;
+      transition: background 0.15s;
+    }
+    .room-code:hover { background: rgba(245,166,35,0.1); }
+
+    /* ── Score cards ── */
+    .score-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .score-card.winner-card {
+      border-color: var(--active-glow);
+      background: rgba(245,166,35,0.08);
+      box-shadow: 0 0 16px rgba(245,166,35,0.25);
+    }
+    .score-rank { font-size: 1.8rem; min-width: 2.5rem; }
+    .score-info { flex: 1; }
+    .score-name { font-weight: 600; font-size: 1.05rem; }
+    .score-obsession { font-size: 0.82rem; color: var(--text-dim); font-style: italic; margin-top: 0.1rem; }
+    .score-skills { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem; }
+    .score-points { font-size: 1.8rem; font-weight: 700; color: var(--accent2); }
+    .score-breakdown { font-size: 0.75rem; color: var(--text-dim); text-align: right; }
+
+    /* ── Tabs / sections ── */
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Layout helpers ── */
+    .flex { display: flex; }
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .text-center { text-align: center; }
+    .text-dim { color: var(--text-dim); }
+    .text-accent { color: var(--accent); }
+    .text-accent2 { color: var(--accent2); }
+    .text-sm { font-size: 0.85rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    /* ── Home screen ── */
+    .home-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 500px) {
+      .home-options { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .role-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .role-card.selected { border-color: var(--accent); background: rgba(233,69,96,0.08); }
+    .role-card .role-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .role-card h3 { margin-bottom: 0.3rem; }
+    .role-card p { font-size: 0.82rem; color: var(--text-dim); }
+
+    /* ── Obsession level selector ── */
+    .level-selector { display: flex; gap: 0.5rem; }
+    .level-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--text-dim);
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .level-btn.selected { border-color: var(--accent2); color: var(--accent2); background: rgba(245,166,35,0.1); }
+    .level-btn:hover:not(.selected) { border-color: var(--text-dim); color: var(--text); }
+    .level-btn .level-num { font-size: 1.2rem; font-weight: 700; display: block; }
+    .level-btn .level-label { font-size: 0.7rem; }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 1.2rem;
+      font-size: 0.9rem;
+      animation: toastIn 0.3s ease;
+      pointer-events: auto;
+    }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    .toast.error { border-color: var(--accent); color: var(--accent); }
+    .toast.info { border-color: var(--accent2); color: var(--accent2); }
+    @keyframes toastIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── GM control buttons row ── */
+    .gm-triggers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Bidding wait state ── */
+    .bid-wait {
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .bid-wait .checkmark { font-size: 3rem; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+    /* ── Phase badge ── */
+    .phase-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .phase-badge.playing { background: rgba(76,175,80,0.2); color: var(--success); }
+    .phase-badge.bidding { background: rgba(233,69,96,0.2); color: var(--accent); }
+    .phase-badge.tiebreak { background: rgba(123,45,139,0.2); color: #c792ff; }
+    .phase-badge.ended { background: rgba(136,136,170,0.2); color: var(--text-dim); }
+    .phase-badge.lobby { background: rgba(15,52,96,0.4); color: #5da6ff; }
+
+    .separator { height: 1px; background: var(--border); margin: 1rem 0; }
+
+    .skill-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .skill-row input { flex: 1; }
+    .skill-row .skill-icon { color: var(--text-dim); font-size: 0.9rem; min-width: 1.2rem; }
+
+    .wp-start-options { display: flex; gap: 0.75rem; }
+    .wp-option {
+      flex: 1;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      background: var(--surface2);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .wp-option.selected { border-color: var(--accent2); background: rgba(245,166,35,0.08); }
+    .wp-option:hover:not(.selected) { border-color: var(--text-dim); }
+    .wp-option .wp-num { font-size: 2rem; font-weight: 700; color: var(--accent2); }
+    .wp-option .wp-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+    .hidden { display: none !important; }
+
+    /* ── Chat ── */
+    .chat-log {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px 10px 0 0;
+      height: 140px;
+      overflow-y: auto;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .chat-msg { line-height: 1.4; }
+    .chat-msg .chat-who { font-weight: 700; }
+    .chat-msg.is-gm .chat-who { color: var(--accent2); }
+    .chat-msg.is-me .chat-who { color: var(--accent); }
+    .chat-msg .chat-text { color: var(--text); }
+    .chat-input-row {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      overflow: hidden;
+    }
+    .chat-input-row input {
+      flex: 1;
+      background: var(--surface2);
+      border: none;
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    .chat-input-row button {
+      background: var(--surface3);
+      border: none;
+      border-left: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chat-input-row button:hover { background: var(--accent); color: #fff; }
+
+    /* ── Pending approval ── */
+    .pending-card {
+      background: var(--surface2);
+      border: 1px solid var(--accent2);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .pending-card .pending-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .pending-card .pending-name { font-weight: 700; font-size: 1rem; }
+    .pending-card .pending-meta { font-size: 0.8rem; color: var(--text-dim); }
+    .pending-card .pending-skills { margin: 0.4rem 0; font-size: 0.85rem; }
+    .pending-card .pending-obsession { font-style: italic; font-size: 0.88rem; color: var(--text-dim); }
+    .pending-card .pending-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .pending-card .reject-reason { flex: 1; min-width: 140px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 0.4rem 0.6rem; font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-container" id="toasts"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+// ── Translations ────────────────────────────────────────────────────────────
+const TRANSLATIONS = {
+  en: {
+    appSubtitle: "A competitive roleplaying game about the Voices in John's head",
+    gmRole: 'Everyone Else', gmRoleDesc: "Run the game as the GM. Create a room and share the code with your players.",
+    voiceRole: 'A Voice', voiceRoleDesc: "Play as one of the Voices in John's head. Join with a room code.",
+    createRoomTitle: 'Create a Room', yourNameGM: 'Your name (as GM)', createRoomBtn: 'Create Room',
+    joinRoomTitle: 'Join a Room', yourName: 'Your name', roomCodeLabel: 'Room code', joinRoomBtn: 'Join Room',
+    waitingPlayers: 'Waiting for players to join...', roomCode: 'Room Code',
+    shareCode: 'Share this code with your players', players: 'Players',
+    pendingApproval: 'Pending Approval', startGame: '▶ Start Game',
+    waitingForN: 'Waiting for {n} player(s)...', waitingForPlayers: 'Waiting for players...',
+    charReady: '✅ Approved & ready', awaitingApproval: '⏳ Awaiting approval...', creatingChar: '✏️ Creating character...',
+    approvedMsg: 'Character approved!', waitingGMApproval: 'Waiting for GM approval...', charSubmitted: 'Your character sheet has been submitted.',
+    waitingGMStart: 'Waiting for the GM to start the game...',
+    charRejected: 'Character rejected', editChar: 'Edit Character', createChar: 'Create Character',
+    gameLog: 'Game Log', chat: 'Chat', sayHere: 'Say something...', send: 'Send',
+    approve: '✅ Approve', reject: '✗ Reject', rejectionReasonPlaceholder: 'Rejection reason (optional)...',
+    createYourVoice: 'Create Your Voice', secretHint: 'Your obsession and skills are secret from other players',
+    willpowerSkills: 'Willpower & Skills', willpowerDesc: 'More willpower means more bids — but fewer skills limits what John can do.',
+    skills2: '2 skills', skills3: '3 skills',
+    yourSkills: 'Your Skills ({n})', skillDesc: 'Short descriptions, e.g. "Drives well" or "Good at persuading people"', skillN: 'Skill {n}...',
+    obsessionTitle: 'Obsession', obsessionSecret: 'Keep this secret! This is your winning condition.',
+    describeObsession: 'Describe your obsession', obsessionPlaceholder: 'e.g. Eating as much candy as possible',
+    difficultyLevel: 'Difficulty level (determines point multiplier)',
+    easy: 'Easy', medium: 'Medium', hard: 'Hard',
+    lvl1Desc: 'Level 1: Pretty easy (e.g. "Pig out on candy")',
+    lvl2Desc: 'Level 2: Risky or difficult (e.g. "Dress up and hit on strangers")',
+    lvl3Desc: 'Level 3: Nearly impossible (e.g. "Blow up a building")',
+    lockIn: '✅ Lock In Character', backToLobby: '← Back to Lobby',
+    gmPortal: 'GM Portal', copy: 'Copy', currentlyActive: 'Currently Active Voice',
+    activeVoice: 'Active Voice', noActive: 'None — trigger a control test',
+    controlEvents: 'Control Events', johnWakes: '⏰ John Wakes', johnHurt: '💥 John Gets Hurt',
+    voiceFailed: '❌ Voice Failed Roll', customReason: '✏️ Custom Reason',
+    controlTestPlaceholder: 'Reason for control test...', trigger: 'Trigger',
+    rollJohnNap: "😴 Roll John's Nap (4+ = sleep)", forceReveal: '⚡ Force Reveal Bids', endGame: '🔚 End Game',
+    tiebreak: '🔁 Tiebreak', tiebreakDesc: 'Tied players roll physical dice. Highest roll wins. Pick the winner:',
+    voices: 'Voices', obsessionX: 'Obsession ×{n}', wpLabel: 'WP',
+    controlTestTitle: '⚔️ Control Test', bidsRevealedTitle: 'Bids Revealed!',
+    bidInstructions: "Bid willpower to take control of John. Highest bid wins.<br>If you win, you lose the bid. Others keep theirs.",
+    yourWillpower: 'Your willpower:', bidZero: 'Bid 0 to pass (but you can still win if all others pass too)',
+    lockInBid: '🔒 Lock In Bid', bidSubmittedTitle: 'Bid Submitted!', bidLocked: 'Your bid is locked in.',
+    waitingOthers: 'Waiting for other Voices... ({n}/{total})',
+    continueBtn: 'Continue', tieAtN: 'Tie at {n}! Roll physical dice to break the tie.', gmWillPick: 'The GM will pick the winner.',
+    takesControl: 'takes control of John!',
+    rollDiceTitle: 'Roll the Dice', activeJohnDesc: 'You are in control of John. Spend willpower for +1 per point.',
+    hasSkillQ: 'Do you have a relevant skill?', yesSkill: '✦ Yes (need 3+)', noSkill: '✗ No (need 6)',
+    spendWP: 'Spend willpower for bonus (+1 per point)', rollBtn: '🎲 Roll!',
+    gameOverTitle: 'Game Over', johnSleep: 'John has finally gone to sleep for good.',
+    finalScores: 'Final Scores', nextGM: '— The Next GM!', revealScores: '📊 Reveal Scores & Obsessions',
+    waitingScores: 'Waiting for GM to reveal scores...', playAgain: 'Play Again',
+    outOfWP: 'Out of willpower!', mySkills: 'Your Skills', allVoices: 'All Voices', youLabel: '(you)',
+    noMsgsYet: 'No messages yet...', loading: 'Loading...',
+    copyCode: 'Copy', copied: 'Code copied!',
+    toastRoomCreated: 'Room {code} created!', toastJoined: 'Joined room {code}!',
+    toastGameStarted: 'Game started!', toastApproved: 'Your character was approved! ✅',
+    toastRejected: 'Character rejected by GM', toastCharLocked: 'Character submitted — waiting for GM approval',
+    toastObsession: '{name} completed their obsession! (×{n})',
+    toastNapped: 'John napped (rolled {n})! All Voices gain 1 WP.', toastAwake: 'John stays awake (rolled {n}).',
+    toastGameOverWP: 'All willpower spent — game over!', toastGameOverGM: 'Game ended by GM.',
+    toastScores: 'Scores revealed!', toastLeft: '{name} left the room',
+    toastGMDC: 'GM disconnected. The game has ended.',
+    toastSuccess: '{name} rolled {n} — success!', toastFailure: '{name} rolled {n} — failure!',
+    toastTiebreak: '{name} wins the tiebreak!', enterName: 'Enter your name',
+    enterCode: 'Enter a valid 4-letter room code', enterSkills: 'Enter {n} skills',
+    enterObsession: 'Describe your obsession', selectSkill: 'Select whether you have a relevant skill',
+    needPlayer: 'Need at least one player ready.',
+    youAre: 'You are', theActiveVoice: 'The Active Voice 👑',
+    willpowerTitle: 'Willpower', rollSuccess: '✅ SUCCESS', rollFailure: '❌ FAILURE',
+    withSkill: 'with skill', withoutSkill: 'without skill',
+    revealHint: 'All obsessions will be revealed when you show scores.',
+    confirmEndGame: 'End the game now?',
+    obsessionScore: 'Level {lvl} × {count} = {pts} pts',
+    rulesTitle: 'Game Rules', rulesBtn: '📖 Rules', rulesClose: '✕ Close',
+    rulesS1T: 'What is Everyone is John?',
+    rulesS1: 'A humorous competitive roleplaying game. One player is the GM ("Everyone Else"). The rest play Voices in the head of John, an insane man from Minneapolis, competing to control him and fulfill their secret obsessions.',
+    rulesS2T: 'Your Voice',
+    rulesS2WP: '🔋 <strong>Willpower</strong> — Your bidding pool. Starts at 10 (2 skills) or 7 (3 skills). Spent to bid for control and boost dice rolls.',
+    rulesS2SK: '⚡ <strong>Skills</strong> — 2 or 3 short descriptions (e.g. "Drives well"). With a relevant skill: roll 3+ to succeed. Without: roll 6.',
+    rulesS2OB: '🎯 <strong>Obsession</strong> — Your secret winning condition. Level 1 (easy ×1 pt), Level 2 (risky ×2 pts), Level 3 (nearly impossible ×3 pts). Keep it secret!',
+    rulesS3T: 'Control Tests',
+    rulesS3: 'Triggered when John wakes, gets hurt, the active Voice fails a roll, or completes an obsession. All Voices secretly and simultaneously bid Willpower. Highest bidder takes control and loses their bid. Others keep theirs. Ties are broken by rolling dice.',
+    rulesS4T: 'Rolling the Dice',
+    rulesS4: 'The active Voice rolls 1d6. With a relevant skill: 3+ succeeds. Without a skill: only 6 succeeds. Before rolling, spend any Willpower for +1 per point.',
+    rulesS5T: "John's Nap",
+    rulesS5: 'When nothing exciting happens for 10+ minutes, the GM rolls. On 4+, John falls asleep — all Voices gain 1 Willpower. A control test happens when he wakes.',
+    rulesS6T: 'Winning',
+    rulesS6: 'The game ends when all Voices run out of Willpower. Reveal all obsessions. Score = completions × obsession level. Highest score wins and becomes the next GM!',
+  },
+  zh: {
+    appSubtitle: '一个关于约翰脑中声音的竞争性角色扮演游戏',
+    gmRole: '所有人', gmRoleDesc: '担任GM主持游戏。创建房间并将代码分享给玩家。',
+    voiceRole: '一个声音', voiceRoleDesc: '扮演约翰脑中的一个声音。使用房间码加入游戏。',
+    createRoomTitle: '创建房间', yourNameGM: '你的名字（作为GM）', createRoomBtn: '创建房间',
+    joinRoomTitle: '加入房间', yourName: '你的名字', roomCodeLabel: '房间码', joinRoomBtn: '加入',
+    waitingPlayers: '等待玩家加入...', roomCode: '房间码',
+    shareCode: '将此代码分享给你的玩家', players: '玩家',
+    pendingApproval: '待审批', startGame: '▶ 开始游戏',
+    waitingForN: '等待 {n} 位玩家...', waitingForPlayers: '等待玩家...',
+    charReady: '✅ 已批准', awaitingApproval: '⏳ 等待审批...', creatingChar: '✏️ 创建角色中...',
+    approvedMsg: '角色已批准！', waitingGMApproval: '等待GM审批...', charSubmitted: '你的角色表已提交。',
+    waitingGMStart: '等待GM开始游戏...',
+    charRejected: '角色被拒绝', editChar: '编辑角色', createChar: '创建角色',
+    gameLog: '游戏日志', chat: '聊天', sayHere: '说点什么...', send: '发送',
+    approve: '✅ 批准', reject: '✗ 拒绝', rejectionReasonPlaceholder: '拒绝原因（可选）...',
+    createYourVoice: '创建你的声音', secretHint: '你的执念和技能对其他玩家保密',
+    willpowerSkills: '意志力与技能', willpowerDesc: '更多意志力意味着更多竞标——但技能越少，约翰能做的事越有限。',
+    skills2: '2项技能', skills3: '3项技能',
+    yourSkills: '你的技能（{n}项）', skillDesc: '简短描述，例如"擅长开车"或"善于说服他人"', skillN: '技能 {n}...',
+    obsessionTitle: '执念', obsessionSecret: '保守秘密！这是你的获胜条件。',
+    describeObsession: '描述你的执念', obsessionPlaceholder: '例如：尽情吃糖',
+    difficultyLevel: '难度等级（决定分数倍数）',
+    easy: '简单', medium: '中等', hard: '困难',
+    lvl1Desc: '等级1：比较容易（例如"尽情吃糖"）',
+    lvl2Desc: '等级2：有风险或困难（例如"扮女装搭讪陌生人"）',
+    lvl3Desc: '等级3：几乎不可能（例如"炸毁一栋楼"）',
+    lockIn: '✅ 确认角色', backToLobby: '← 返回大厅',
+    gmPortal: 'GM面板', copy: '复制', currentlyActive: '当前活跃声音',
+    activeVoice: '活跃声音', noActive: '无 — 触发控制测试',
+    controlEvents: '控制事件', johnWakes: '⏰ 约翰醒来', johnHurt: '💥 约翰受伤',
+    voiceFailed: '❌ 声音掷骰失败', customReason: '✏️ 自定义原因',
+    controlTestPlaceholder: '控制测试原因...', trigger: '触发',
+    rollJohnNap: '😴 掷骰约翰小睡（4+=睡着）', forceReveal: '⚡ 强制公开竞标', endGame: '🔚 结束游戏',
+    tiebreak: '🔁 平局决胜', tiebreakDesc: '平局玩家掷实体骰子。最高点数获胜。选择胜者：',
+    voices: '声音', obsessionX: '执念 ×{n}', wpLabel: '意志',
+    controlTestTitle: '⚔️ 控制测试', bidsRevealedTitle: '竞标揭晓！',
+    bidInstructions: '竞标意志力来控制约翰。最高竞标获胜。<br>若获胜，你失去竞标的意志力。其他人保留。',
+    yourWillpower: '你的意志力：', bidZero: '竞标0表示放弃（但如果所有人都竞标0你仍可获胜）',
+    lockInBid: '🔒 确认竞标', bidSubmittedTitle: '竞标已提交！', bidLocked: '你的竞标已锁定。',
+    waitingOthers: '等待其他声音... ({n}/{total})',
+    continueBtn: '继续', tieAtN: '在{n}点平局！掷实体骰子决胜。', gmWillPick: 'GM将选择获胜者。',
+    takesControl: '取得了约翰的控制权！',
+    rollDiceTitle: '掷骰子', activeJohnDesc: '你正在控制约翰。花费意志力可获得每点+1。',
+    hasSkillQ: '你有相关技能吗？', yesSkill: '✦ 有（需要3+）', noSkill: '✗ 没有（需要6）',
+    spendWP: '花费意志力加成（每点+1）', rollBtn: '🎲 掷！',
+    gameOverTitle: '游戏结束', johnSleep: '约翰终于沉沉睡去。',
+    finalScores: '最终得分', nextGM: '— 下一任GM！', revealScores: '📊 揭晓得分与执念',
+    waitingScores: '等待GM揭晓得分...', playAgain: '再玩一次',
+    outOfWP: '意志力耗尽！', mySkills: '你的技能', allVoices: '所有声音', youLabel: '（你）',
+    noMsgsYet: '暂无消息...', loading: '加载中...',
+    copyCode: '复制', copied: '代码已复制！',
+    toastRoomCreated: '房间 {code} 已创建！', toastJoined: '已加入房间 {code}！',
+    toastGameStarted: '游戏开始！', toastApproved: '你的角色已批准！✅',
+    toastRejected: 'GM拒绝了你的角色', toastCharLocked: '角色已提交 — 等待GM审批',
+    toastObsession: '{name} 完成了执念！(×{n})',
+    toastNapped: '约翰睡着了（掷了{n}）！所有声音获得1意志力。', toastAwake: '约翰保持清醒（掷了{n}）。',
+    toastGameOverWP: '所有意志力耗尽 — 游戏结束！', toastGameOverGM: 'GM结束了游戏。',
+    toastScores: '得分已揭晓！', toastLeft: '{name} 离开了房间',
+    toastGMDC: 'GM断开连接。游戏已结束。',
+    toastSuccess: '{name} 掷了 {n} — 成功！', toastFailure: '{name} 掷了 {n} — 失败！',
+    toastTiebreak: '{name} 赢得了平局决胜！', enterName: '请输入你的名字',
+    enterCode: '请输入有效的4位房间码', enterSkills: '请输入 {n} 项技能',
+    enterObsession: '请描述你的执念', selectSkill: '请选择你是否有相关技能',
+    needPlayer: '至少需要一名玩家准备就绪。',
+    youAre: '你是', theActiveVoice: '活跃声音 👑',
+    willpowerTitle: '意志力', rollSuccess: '✅ 成功', rollFailure: '❌ 失败',
+    withSkill: '有技能', withoutSkill: '无技能',
+    revealHint: '显示得分时将揭晓所有执念。',
+    confirmEndGame: '现在结束游戏？',
+    obsessionScore: '等级 {lvl} × {count} = {pts} 分',
+    rulesTitle: '游戏规则', rulesBtn: '📖 规则', rulesClose: '✕ 关闭',
+    rulesS1T: '游戏简介',
+    rulesS1: '一款幽默的竞争性角色扮演游戏。一名玩家担任GM（"所有人"），其余玩家扮演明尼阿波利斯疯子约翰脑中的声音，争夺对约翰的控制权并完成各自的秘密执念。',
+    rulesS2T: '你的声音',
+    rulesS2WP: '🔋 <strong>意志力</strong> — 竞标资源。起始为10（2项技能）或7（3项技能）。用于竞标控制权和提升掷骰结果。',
+    rulesS2SK: '⚡ <strong>技能</strong> — 2~3项简短描述（如"擅长开车"）。有相关技能时需掷3+成功；无技能时需掷6。',
+    rulesS2OB: '🎯 <strong>执念</strong> — 你的秘密获胜条件。等级1（容易×1分），等级2（有风险×2分），等级3（几乎不可能×3分）。保守秘密！',
+    rulesS3T: '控制测试',
+    rulesS3: '当约翰醒来、受伤、当前活跃声音掷骰失败或完成执念时触发。所有声音同时秘密竞标意志力。最高竞标者获得控制权并失去竞标值，其他人保留竞标值。平局时掷骰决胜。',
+    rulesS4T: '掷骰子',
+    rulesS4: '活跃声音掷1d6。有相关技能时：3+成功。无相关技能：仅6成功。掷骰前可花费任意意志力，每点+1加成。',
+    rulesS5T: '约翰小睡',
+    rulesS5: '当10分钟以上没有刺激事件时，GM掷骰。4+则约翰睡着——所有声音获得1点意志力。约翰醒来时进行控制测试。',
+    rulesS6T: '胜利条件',
+    rulesS6: '当所有声音耗尽意志力时游戏结束。公开所有执念。得分=完成次数×执念等级。最高分者获胜，并担任下一局GM！',
+  },
+  vi: {
+    appSubtitle: 'Trò chơi nhập vai cạnh tranh về những Tiếng Nói trong đầu John',
+    gmRole: 'Tất Cả Mọi Người', gmRoleDesc: 'Điều hành trò chơi với tư cách GM. Tạo phòng và chia sẻ mã cho người chơi.',
+    voiceRole: 'Một Tiếng Nói', voiceRoleDesc: 'Chơi với tư cách một Tiếng Nói trong đầu John. Tham gia bằng mã phòng.',
+    createRoomTitle: 'Tạo Phòng', yourNameGM: 'Tên của bạn (với tư cách GM)', createRoomBtn: 'Tạo Phòng',
+    joinRoomTitle: 'Tham Gia Phòng', yourName: 'Tên của bạn', roomCodeLabel: 'Mã phòng', joinRoomBtn: 'Tham Gia',
+    waitingPlayers: 'Đang chờ người chơi tham gia...', roomCode: 'Mã Phòng',
+    shareCode: 'Chia sẻ mã này với người chơi của bạn', players: 'Người Chơi',
+    pendingApproval: 'Chờ Phê Duyệt', startGame: '▶ Bắt Đầu',
+    waitingForN: 'Đang chờ {n} người chơi...', waitingForPlayers: 'Đang chờ người chơi...',
+    charReady: '✅ Đã được chấp thuận', awaitingApproval: '⏳ Đang chờ phê duyệt...', creatingChar: '✏️ Đang tạo nhân vật...',
+    approvedMsg: 'Nhân vật được chấp thuận!', waitingGMApproval: 'Đang chờ GM phê duyệt...', charSubmitted: 'Bảng nhân vật của bạn đã được gửi.',
+    waitingGMStart: 'Đang chờ GM bắt đầu trò chơi...',
+    charRejected: 'Nhân vật bị từ chối', editChar: 'Chỉnh Sửa Nhân Vật', createChar: 'Tạo Nhân Vật',
+    gameLog: 'Nhật Ký', chat: 'Trò Chuyện', sayHere: 'Nói gì đó...', send: 'Gửi',
+    approve: '✅ Chấp Thuận', reject: '✗ Từ Chối', rejectionReasonPlaceholder: 'Lý do từ chối (tùy chọn)...',
+    createYourVoice: 'Tạo Tiếng Nói Của Bạn', secretHint: 'Ám ảnh và kỹ năng của bạn là bí mật với người chơi khác',
+    willpowerSkills: 'Ý Chí & Kỹ Năng', willpowerDesc: 'Nhiều ý chí hơn có nghĩa là nhiều lần đặt cược hơn — nhưng ít kỹ năng sẽ hạn chế những gì John có thể làm.',
+    skills2: '2 kỹ năng', skills3: '3 kỹ năng',
+    yourSkills: 'Kỹ Năng Của Bạn ({n})', skillDesc: 'Mô tả ngắn, ví dụ: "Lái xe giỏi" hoặc "Giỏi thuyết phục"', skillN: 'Kỹ năng {n}...',
+    obsessionTitle: 'Ám Ảnh', obsessionSecret: 'Giữ bí mật! Đây là điều kiện chiến thắng của bạn.',
+    describeObsession: 'Mô tả ám ảnh của bạn', obsessionPlaceholder: 'Vd: Ăn thật nhiều kẹo',
+    difficultyLevel: 'Mức độ khó (xác định hệ số nhân điểm)',
+    easy: 'Dễ', medium: 'Vừa', hard: 'Khó',
+    lvl1Desc: 'Cấp 1: Khá dễ (vd: "Ăn kẹo thỏa thích")',
+    lvl2Desc: 'Cấp 2: Rủi ro hoặc khó (vd: "Mặc đồ phụ nữ và tán tỉnh người lạ")',
+    lvl3Desc: 'Cấp 3: Gần như không thể (vd: "Phá nổ một tòa nhà")',
+    lockIn: '✅ Xác Nhận Nhân Vật', backToLobby: '← Quay Lại Sảnh',
+    gmPortal: 'Cổng GM', copy: 'Sao Chép', currentlyActive: 'Tiếng Nói Đang Hoạt Động',
+    activeVoice: 'Tiếng Nói Hiện Tại', noActive: 'Không có — kích hoạt kiểm tra kiểm soát',
+    controlEvents: 'Sự Kiện Kiểm Soát', johnWakes: '⏰ John Thức Dậy', johnHurt: '💥 John Bị Thương',
+    voiceFailed: '❌ Tiếng Nói Thất Bại', customReason: '✏️ Lý Do Tùy Chỉnh',
+    controlTestPlaceholder: 'Lý do kiểm tra kiểm soát...', trigger: 'Kích Hoạt',
+    rollJohnNap: '😴 Tung Xúc Xắc Giấc Ngủ (4+=ngủ)', forceReveal: '⚡ Tiết Lộ Đặt Cược', endGame: '🔚 Kết Thúc',
+    tiebreak: '🔁 Tiebreak', tiebreakDesc: 'Người chơi hòa tung xúc xắc thực. Điểm cao nhất thắng. Chọn người thắng:',
+    voices: 'Tiếng Nói', obsessionX: 'Ám Ảnh ×{n}', wpLabel: 'ÝC',
+    controlTestTitle: '⚔️ Kiểm Tra Kiểm Soát', bidsRevealedTitle: 'Đặt Cược Được Tiết Lộ!',
+    bidInstructions: 'Đặt cược ý chí để kiểm soát John. Đặt cao nhất thắng.<br>Nếu thắng, bạn mất số đã đặt. Người khác giữ lại.',
+    yourWillpower: 'Ý chí của bạn:', bidZero: 'Đặt 0 để bỏ qua (nhưng vẫn có thể thắng nếu mọi người đặt 0)',
+    lockInBid: '🔒 Xác Nhận Đặt Cược', bidSubmittedTitle: 'Đã Đặt Cược!', bidLocked: 'Đặt cược của bạn đã được khóa.',
+    waitingOthers: 'Đang chờ các Tiếng Nói khác... ({n}/{total})',
+    continueBtn: 'Tiếp Tục', tieAtN: 'Hòa tại {n}! Tung xúc xắc để phân thắng bại.', gmWillPick: 'GM sẽ chọn người thắng.',
+    takesControl: 'kiểm soát John!',
+    rollDiceTitle: 'Tung Xúc Xắc', activeJohnDesc: 'Bạn đang kiểm soát John. Chi ý chí để +1 mỗi điểm.',
+    hasSkillQ: 'Bạn có kỹ năng liên quan không?', yesSkill: '✦ Có (cần 3+)', noSkill: '✗ Không (cần 6)',
+    spendWP: 'Chi ý chí để được cộng điểm (+1 mỗi điểm)', rollBtn: '🎲 Tung!',
+    gameOverTitle: 'Kết Thúc', johnSleep: 'John đã chìm vào giấc ngủ.',
+    finalScores: 'Điểm Cuối Cùng', nextGM: '— GM Tiếp Theo!', revealScores: '📊 Tiết Lộ Điểm & Ám Ảnh',
+    waitingScores: 'Đang chờ GM tiết lộ điểm...', playAgain: 'Chơi Lại',
+    outOfWP: 'Hết ý chí!', mySkills: 'Kỹ Năng Của Bạn', allVoices: 'Tất Cả Tiếng Nói', youLabel: '(bạn)',
+    noMsgsYet: 'Chưa có tin nhắn...', loading: 'Đang tải...',
+    copyCode: 'Sao Chép', copied: 'Đã sao chép mã!',
+    toastRoomCreated: 'Phòng {code} đã được tạo!', toastJoined: 'Đã tham gia phòng {code}!',
+    toastGameStarted: 'Trò chơi bắt đầu!', toastApproved: 'Nhân vật của bạn được chấp thuận! ✅',
+    toastRejected: 'GM từ chối nhân vật của bạn', toastCharLocked: 'Đã gửi nhân vật — đang chờ GM phê duyệt',
+    toastObsession: '{name} hoàn thành ám ảnh! (×{n})',
+    toastNapped: 'John ngủ (tung {n})! Tất cả Tiếng Nói nhận 1 ý chí.', toastAwake: 'John vẫn thức (tung {n}).',
+    toastGameOverWP: 'Hết ý chí — kết thúc trò chơi!', toastGameOverGM: 'GM kết thúc trò chơi.',
+    toastScores: 'Điểm đã được tiết lộ!', toastLeft: '{name} đã rời phòng',
+    toastGMDC: 'GM ngắt kết nối. Trò chơi đã kết thúc.',
+    toastSuccess: '{name} tung {n} — thành công!', toastFailure: '{name} tung {n} — thất bại!',
+    toastTiebreak: '{name} thắng tiebreak!', enterName: 'Nhập tên của bạn',
+    enterCode: 'Nhập mã phòng 4 ký tự hợp lệ', enterSkills: 'Nhập {n} kỹ năng',
+    enterObsession: 'Mô tả ám ảnh của bạn', selectSkill: 'Chọn xem bạn có kỹ năng liên quan không',
+    needPlayer: 'Cần ít nhất một người chơi sẵn sàng.',
+    youAre: 'Bạn là', theActiveVoice: 'Tiếng Nói Hiện Tại 👑',
+    willpowerTitle: 'Ý Chí', rollSuccess: '✅ THÀNH CÔNG', rollFailure: '❌ THẤT BẠI',
+    withSkill: 'có kỹ năng', withoutSkill: 'không có kỹ năng',
+    revealHint: 'Tất cả ám ảnh sẽ được tiết lộ khi bạn hiện điểm.',
+    confirmEndGame: 'Kết thúc trò chơi ngay bây giờ?',
+    obsessionScore: 'Cấp {lvl} × {count} = {pts} điểm',
+    rulesTitle: 'Luật Chơi', rulesBtn: '📖 Luật', rulesClose: '✕ Đóng',
+    rulesS1T: 'Everyone is John là gì?',
+    rulesS1: 'Trò chơi nhập vai cạnh tranh hài hước. Một người làm GM ("Tất cả mọi người"), số còn lại đóng vai các Tiếng Nói trong đầu John — một người điên ở Minneapolis — cạnh tranh để kiểm soát anh ta và hoàn thành ám ảnh bí mật của mình.',
+    rulesS2T: 'Tiếng Nói Của Bạn',
+    rulesS2WP: '🔋 <strong>Ý Chí</strong> — Nguồn đặt cược. Bắt đầu ở 10 (2 kỹ năng) hoặc 7 (3 kỹ năng). Dùng để giành quyền kiểm soát và tăng kết quả tung xúc xắc.',
+    rulesS2SK: '⚡ <strong>Kỹ Năng</strong> — 2-3 mô tả ngắn (vd: "Lái xe giỏi"). Có kỹ năng liên quan: cần 3+ để thành công. Không có: cần 6.',
+    rulesS2OB: '🎯 <strong>Ám Ảnh</strong> — Điều kiện chiến thắng bí mật. Cấp 1 (dễ ×1 điểm), Cấp 2 (rủi ro ×2 điểm), Cấp 3 (gần như không thể ×3 điểm). Giữ bí mật!',
+    rulesS3T: 'Kiểm Tra Kiểm Soát',
+    rulesS3: 'Kích hoạt khi John thức dậy, bị thương, Tiếng Nói đang hoạt động thất bại, hoặc hoàn thành ám ảnh. Tất cả Tiếng Nói đồng thời đặt cược Ý Chí bí mật. Người đặt cao nhất giành quyền kiểm soát và mất số đặt cược, người khác giữ lại. Hòa thì tung xúc xắc.',
+    rulesS4T: 'Tung Xúc Xắc',
+    rulesS4: 'Tiếng Nói đang hoạt động tung 1d6. Có kỹ năng liên quan: 3+ thành công. Không có kỹ năng: chỉ 6 thành công. Trước khi tung, chi bất kỳ Ý Chí nào để +1 mỗi điểm.',
+    rulesS5T: 'Giấc Ngủ Của John',
+    rulesS5: 'Khi không có gì thú vị xảy ra trong hơn 10 phút, GM tung xúc xắc. Nếu ra 4+, John ngủ — tất cả Tiếng Nói nhận 1 Ý Chí. Kiểm tra kiểm soát xảy ra khi anh ta thức dậy.',
+    rulesS6T: 'Chiến Thắng',
+    rulesS6: 'Trò chơi kết thúc khi tất cả Tiếng Nói hết Ý Chí. Tiết lộ tất cả ám ảnh. Điểm = số lần hoàn thành × cấp độ ám ảnh. Điểm cao nhất thắng và trở thành GM tiếp theo!',
+  },
+};
+
+const LANG_META = {
+  en: { label: '🇺🇸 EN', next: 'zh' },
+  zh: { label: '🇨🇳 中文', next: 'vi' },
+  vi: { label: '🇻🇳 VI', next: 'en' },
+};
+
+function t(key, vars = {}) {
+  const str = TRANSLATIONS[S.lang]?.[key] ?? TRANSLATIONS.en[key] ?? key;
+  return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+}
+
+function cycleLang() {
+  S.lang = LANG_META[S.lang].next;
+  render();
+}
+
+function toggleRules() {
+  S.showRules = !S.showRules;
+  const rm = document.getElementById('rules-modal');
+  if (rm) rm.innerHTML = S.showRules ? renderRulesModal() : '';
+}
+
+function renderRulesContent() {
+  return [
+    { title: t('rulesS1T'), body: `<p>${t('rulesS1')}</p>` },
+    { title: t('rulesS2T'), body: `<ul style="list-style:none;padding:0;margin:0;">
+        <li style="padding:0.35rem 0;border-bottom:1px solid var(--border);">${t('rulesS2WP')}</li>
+        <li style="padding:0.35rem 0;border-bottom:1px solid var(--border);">${t('rulesS2SK')}</li>
+        <li style="padding:0.35rem 0;">${t('rulesS2OB')}</li>
+      </ul>` },
+    { title: t('rulesS3T'), body: `<p>${t('rulesS3')}</p>` },
+    { title: t('rulesS4T'), body: `<p>${t('rulesS4')}</p>` },
+    { title: t('rulesS5T'), body: `<p>${t('rulesS5')}</p>` },
+    { title: t('rulesS6T'), body: `<p>${t('rulesS6')}</p>` },
+  ].map((s, i, arr) => `
+    <div style="margin-bottom:0.9rem;">
+      <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:0.35rem;font-weight:700;">${s.title}</div>
+      <div style="font-size:0.86rem;color:var(--text);line-height:1.65;">${s.body}</div>
+    </div>${i < arr.length - 1 ? '<div style="height:1px;background:var(--border);margin-bottom:0.9rem;"></div>' : ''}`
+  ).join('');
+}
+
+function renderRulesModal() {
+  return `
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:400;display:flex;align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)toggleRules()">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:1.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+        <h2 style="color:var(--accent2);font-size:1.2rem;">${t('rulesTitle')}</h2>
+        <button onclick="toggleRules()" style="background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-dim);padding:0.3rem 0.75rem;cursor:pointer;font-size:0.85rem;">${t('rulesClose')}</button>
+      </div>
+      ${renderRulesContent()}
+    </div>
+  </div>`;
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
+const S = {
+  view: 'home',         // home | lobby | character | game | scoring
+  role: null,           // 'gm' | 'player'
+  playerId: null,
+  roomCode: null,
+  playerName: null,
+  character: null,      // private character data
+  roomState: null,
+  log: [],
+  bidding: {
+    active: false,
+    reason: '',
+    myBid: null,
+    submitted: false,
+    revealed: false,
+    results: null,
+    tieWinners: null,
+  },
+  lastDice: null,
+  scores: null,
+  gmSheets: {},         // GM-only: { playerId: { skills, obsession, ... } }
+  characterPending: false,
+  characterApproved: false,
+  rejectionReason: null,
+  chat: [],
+  lang: 'en',
+  showRules: false,
+};
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  switch (S.view) {
+    case 'home':       app.innerHTML = renderHome(); break;
+    case 'lobby':      app.innerHTML = renderLobby(); break;
+    case 'character':  app.innerHTML = renderCharacterCreation(); break;
+    case 'game':       app.innerHTML = renderGame(); break;
+    case 'scoring':    app.innerHTML = renderScoring(); break;
+  }
+  // Language toggle — persistent across all screens
+  let lt = document.getElementById('lang-toggle');
+  if (!lt) {
+    lt = document.createElement('div');
+    lt.id = 'lang-toggle';
+    lt.style.cssText = 'position:fixed;bottom:1.2rem;right:1.2rem;z-index:500;';
+    document.body.appendChild(lt);
+  }
+  lt.innerHTML = `<button onclick="cycleLang()" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--text);padding:0.4rem 0.9rem;font-size:0.85rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);">${LANG_META[S.lang].label}</button>`;
+
+  // Rules button — persistent across all screens
+  let rb = document.getElementById('rules-btn');
+  if (!rb) {
+    rb = document.createElement('div');
+    rb.id = 'rules-btn';
+    rb.style.cssText = 'position:fixed;bottom:1.2rem;left:1.2rem;z-index:500;';
+    document.body.appendChild(rb);
+  }
+  rb.innerHTML = `<button onclick="toggleRules()" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--text);padding:0.4rem 0.9rem;font-size:0.85rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);">${t('rulesBtn')}</button>`;
+
+  // Rules modal container
+  let rm = document.getElementById('rules-modal');
+  if (!rm) {
+    rm = document.createElement('div');
+    rm.id = 'rules-modal';
+    document.body.appendChild(rm);
+  }
+  rm.innerHTML = S.showRules ? renderRulesModal() : '';
+
+  attachHandlers();
+}
+
+// ── Home ───────────────────────────────────────────────────────────────────
+function renderHome() {
+  return `
+  <div class="screen">
+    <div class="app-header">
+      <h1>Everyone is John</h1>
+      <p>${t('appSubtitle')}</p>
+      <p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.4rem;">App by <strong style="color:var(--text-dim)">Zizhuo Yue</strong> · Everyone is John © 2002 by <strong style="color:var(--text-dim)">Michael Sullivan</strong>, CC BY 4.0</p>
+    </div>
+
+    <div class="home-options">
+      <div class="role-card" id="role-gm" onclick="selectRole('gm')">
+        <div class="role-icon">🎭</div>
+        <h3>${t('gmRole')}</h3>
+        <p>${t('gmRoleDesc')}</p>
+      </div>
+      <div class="role-card" id="role-player" onclick="selectRole('player')">
+        <div class="role-icon">🧠</div>
+        <h3>${t('voiceRole')}</h3>
+        <p>${t('voiceRoleDesc')}</p>
+      </div>
+    </div>
+
+    <div id="home-gm-form" class="card mt-3 hidden">
+      <h2>${t('createRoomTitle')}</h2>
+      <div class="form-group">
+        <label>${t('yourNameGM')}</label>
+        <input type="text" id="gm-name" placeholder="${t('gmRole')}" maxlength="24" />
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="createRoom()">${t('createRoomBtn')}</button>
+    </div>
+
+    <div id="home-player-form" class="card mt-3 hidden">
+      <h2>${t('joinRoomTitle')}</h2>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>${t('yourName')}</label>
+          <input type="text" id="player-name" placeholder="Voice of Chaos" maxlength="24" />
+        </div>
+        <div class="form-group">
+          <label>${t('roomCodeLabel')}</label>
+          <input type="text" id="room-code-input" placeholder="XXXX" maxlength="4"
+                 style="text-transform:uppercase;letter-spacing:0.15em;font-size:1.1rem;font-weight:700"
+                 oninput="this.value=this.value.toUpperCase()" />
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="joinRoom()">${t('joinRoomBtn')}</button>
+    </div>
+
+    <div class="card mt-3">
+      <h2>${t('rulesTitle')}</h2>
+      ${renderRulesContent()}
+    </div>
+  </div>`;
+}
+
+function selectRole(role) {
+  S.role = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('role-' + role).classList.add('selected');
+  document.getElementById('home-gm-form').classList.toggle('hidden', role !== 'gm');
+  document.getElementById('home-player-form').classList.toggle('hidden', role !== 'player');
+}
+
+// ── Lobby ──────────────────────────────────────────────────────────────────
+function renderLobby() {
+  const rs = S.roomState;
+  const players = rs ? Object.entries(rs.players).filter(([,p]) => !p.isGM) : [];
+  const allReady = players.length > 0 && players.every(([,p]) => p.characterReady);
+  const pending = players.filter(([,p]) => p.pendingApproval);
+  const isGM = S.role === 'gm';
+
+  // Derive approval status from room state (authoritative) with local state as fallback
+  const myState = rs?.players[S.playerId];
+  const isApproved = myState?.characterReady || S.characterApproved;
+  const isPending  = myState?.pendingApproval  || S.characterPending;
+
+  return `
+  <div class="screen">
+    <div class="app-header">
+      <h1>Everyone is John</h1>
+      <p>${t('waitingPlayers')}</p>
+    </div>
+
+    <div class="card text-center">
+      <h2>${t('roomCode')}</h2>
+      <div class="room-code" onclick="copyCode()" title="Click to copy">${S.roomCode}</div>
+      <p class="text-sm text-dim mt-1">${t('shareCode')}</p>
+    </div>
+
+    ${isGM ? `
+      ${pending.length > 0 ? `
+      <div class="card" style="border-color:var(--accent2);">
+        <h2>⏳ ${t('pendingApproval')} (${pending.length})</h2>
+        ${pending.map(([id, p]) => {
+          const sheet = S.gmSheets[id] || {};
+          return `
+          <div class="pending-card">
+            <div class="pending-header">
+              <div class="player-avatar">${p.name[0].toUpperCase()}</div>
+              <div>
+                <div class="pending-name">${p.name}</div>
+                <div class="pending-meta">${t('wpLabel')} ${sheet.willpower || p.willpower} · ${sheet.skills?.length || 0} skills · Obsession Lv${sheet.obsessionLevel || p.obsessionLevel}</div>
+              </div>
+            </div>
+            ${sheet.skills ? `<div class="pending-skills">${sheet.skills.map(s => `✦ ${s}`).join('<br>')}</div>` : ''}
+            ${sheet.obsession ? `<div class="pending-obsession">"${sheet.obsession}"</div>` : ''}
+            <div class="pending-actions">
+              <button class="btn btn-success btn-sm" onclick="approveCharacter('${id}')">${t('approve')}</button>
+              <input type="text" class="reject-reason" id="reject-reason-${id}" placeholder="${t('rejectionReasonPlaceholder')}" />
+              <button class="btn btn-danger btn-sm" onclick="rejectCharacter('${id}')">${t('reject')}</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+
+      <div class="card">
+        <div class="section-title">${t('players')} (${players.length})</div>
+        <div class="player-list">
+          ${players.length === 0 ? `<p class="text-dim text-sm text-center">${t('waitingForPlayers')}</p>` :
+            players.map(([id, p]) => `
+              <div class="player-card ${p.characterReady ? 'ready' : 'not-ready'}">
+                <div class="player-avatar">${p.name[0].toUpperCase()}</div>
+                <div class="player-info">
+                  <div class="player-name">${p.name}</div>
+                  <div class="player-meta">${p.characterReady ? t('charReady') : p.pendingApproval ? t('awaitingApproval') : t('creatingChar')}</div>
+                </div>
+              </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <button class="btn btn-primary btn-full btn-lg" onclick="startGame()" ${allReady ? '' : 'disabled'}>
+          ${allReady ? t('startGame') : players.length === 0 ? t('waitingForPlayers') : t('waitingForN', {n: players.filter(([,p]) => !p.characterReady).length})}
+        </button>
+      </div>
+    ` : `
+    <div class="card">
+      ${isApproved ? `
+        <div style="text-align:center;padding:0.5rem 0;">
+          <div style="font-size:2rem;">✅</div>
+          <div style="font-weight:700;color:var(--success);margin-top:0.4rem;">${t('approvedMsg')}</div>
+          <div class="text-sm text-dim mt-1">${t('waitingGMStart')}</div>
+        </div>
+      ` : isPending ? `
+        <div style="text-align:center;padding:0.5rem 0;">
+          <div style="font-size:2rem;">🤫</div>
+          <div style="font-weight:700;color:var(--accent2);margin-top:0.4rem;">${t('waitingGMApproval')}</div>
+          <div class="text-sm text-dim mt-1">${t('charSubmitted')}</div>
+        </div>
+      ` : `
+        <div style="text-align:center;">
+          ${S.rejectionReason !== null ? `
+            <div style="color:var(--accent);font-weight:600;margin-bottom:0.5rem;">❌ ${t('charRejected')}</div>
+            ${S.rejectionReason ? `<div class="text-sm text-dim mb-2">"${S.rejectionReason}"</div>` : ''}
+          ` : `<p class="text-dim mb-2">${t('charSubmitted')}</p>`}
+          <button class="btn btn-secondary" onclick="goToCharacter()">📝 ${S.rejectionReason !== null ? t('editChar') : t('createChar')}</button>
+        </div>
+      `}
+    </div>
+    `}
+
+    <div class="card">
+      <div class="section-title">${t('gameLog')}</div>
+      <div class="game-log" id="game-log">${renderLog()}</div>
+    </div>
+
+    ${renderChatBox()}
+  </div>`;
+}
+
+// ── Character Creation ─────────────────────────────────────────────────────
+function renderCharacterCreation() {
+  const ch = S.character || { skills: ['', ''], obsession: '', obsessionLevel: 1, willpowerStart: 10 };
+  const skillCount = ch.willpowerStart === 7 ? 3 : 2;
+
+  return `
+  <div class="screen">
+    <div class="app-header">
+      <h1>${t('createYourVoice')}</h1>
+      <p>${t('secretHint')}</p>
+    </div>
+
+    <div class="card">
+      <h2>${t('willpowerSkills')}</h2>
+      <p class="text-sm text-dim mb-2">${t('willpowerDesc')}</p>
+      <div class="wp-start-options">
+        <div class="wp-option ${ch.willpowerStart !== 7 ? 'selected' : ''}" onclick="setWPStart(10)">
+          <div class="wp-num">10</div>
+          <div class="wp-desc">${t('skills2')}</div>
+        </div>
+        <div class="wp-option ${ch.willpowerStart === 7 ? 'selected' : ''}" onclick="setWPStart(7)">
+          <div class="wp-num">7</div>
+          <div class="wp-desc">${t('skills3')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="skills-card">
+      <h2>${t('yourSkills', {n: skillCount})}</h2>
+      <p class="text-sm text-dim mb-2">${t('skillDesc')}</p>
+      <div id="skills-list">
+        ${Array.from({length: skillCount}, (_, i) => `
+          <div class="skill-row">
+            <span class="skill-icon">✦</span>
+            <input type="text" class="skill-input" placeholder="${t('skillN', {n: i+1})}" maxlength="60"
+                   value="${ch.skills[i] || ''}" />
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>${t('obsessionTitle')}</h2>
+      <p class="text-sm text-dim mb-2">${t('obsessionSecret')}</p>
+      <div class="form-group">
+        <label>${t('describeObsession')}</label>
+        <input type="text" id="obsession-input" maxlength="80"
+               placeholder="${t('obsessionPlaceholder')}"
+               value="${ch.obsession || ''}" />
+      </div>
+      <div class="form-group">
+        <label>${t('difficultyLevel')}</label>
+        <div class="level-selector">
+          ${[1,2,3].map(l => `
+            <div class="level-btn ${ch.obsessionLevel === l ? 'selected' : ''}" onclick="setLevel(${l})">
+              <span class="level-num">${l}</span>
+              <span class="level-label">${[t('easy'),t('medium'),t('hard')][l-1]}</span>
+            </div>`).join('')}
+        </div>
+        <p class="text-sm text-dim mt-1">
+          ${[t('lvl1Desc'), t('lvl2Desc'), t('lvl3Desc')][ch.obsessionLevel - 1]}
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="btn btn-primary btn-full btn-lg" onclick="submitCharacter()">${t('lockIn')}</button>
+      <button class="btn btn-ghost btn-full mt-1" onclick="backToLobby()">${t('backToLobby')}</button>
+    </div>
+  </div>`;
+}
+
+// ── Game: GM View ──────────────────────────────────────────────────────────
+function renderGMGame() {
+  const rs = S.roomState;
+  const players = rs ? Object.entries(rs.players).filter(([,p]) => !p.isGM) : [];
+  const phase = rs?.phase || 'playing';
+
+  return `
+  <div class="screen">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
+      <h2 style="font-size:1.1rem;">${t('gmPortal')} <span class="phase-badge ${phase}">${phase}</span></h2>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <span class="text-sm text-dim">Room: <strong class="text-accent2">${S.roomCode}</strong></span>
+        <button class="btn btn-ghost btn-sm" onclick="copyCode()">${t('copy')}</button>
+      </div>
+    </div>
+
+    ${rs?.activeVoice ? `
+    <div class="active-voice-banner">
+      <div class="label">${t('currentlyActive')}</div>
+      <div class="name">${rs.activeVoiceName}</div>
+    </div>` : `
+    <div class="active-voice-banner" style="border-color:var(--border)">
+      <div class="label">${t('activeVoice')}</div>
+      <div class="name" style="color:var(--text-dim);font-size:1rem;">${t('noActive')}</div>
+    </div>`}
+
+    <div class="card">
+      <div class="section-title">${t('controlEvents')}</div>
+      <div class="gm-triggers">
+        <button class="btn btn-primary btn-sm" onclick="gmTrigger('John wakes up!')">${t('johnWakes')}</button>
+        <button class="btn btn-warning btn-sm" onclick="gmTrigger('John gets hurt!')">${t('johnHurt')}</button>
+        <button class="btn btn-secondary btn-sm" onclick="gmTrigger('Active Voice failed a roll!')">${t('voiceFailed')}</button>
+        <button class="btn btn-secondary btn-sm" onclick="showCustomTrigger()">${t('customReason')}</button>
+      </div>
+      <div id="custom-trigger-row" class="hidden" style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <input type="text" id="custom-trigger-input" placeholder="${t('controlTestPlaceholder')}" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:0.5rem 0.75rem;" />
+        <button class="btn btn-primary btn-sm" onclick="gmCustomTrigger()">${t('trigger')}</button>
+      </div>
+      <div class="separator"></div>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="johnNap()">${t('rollJohnNap')}</button>
+        ${phase === 'bidding' || phase === 'tiebreak' ? `<button class="btn btn-warning btn-sm" onclick="forceReveal()">${t('forceReveal')}</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="endGame()">${t('endGame')}</button>
+      </div>
+    </div>
+
+    ${phase === 'tiebreak' ? renderTiebreakPanel() : ''}
+
+    <div class="card">
+      <div class="section-title">${t('voices')}</div>
+      <div class="player-list">
+        ${players.map(([id, p]) => {
+          const sheet = S.gmSheets[id] || {};
+          return `
+          <div class="player-card ${p.isActive ? 'active' : ''}">
+            <div class="player-avatar ${p.isActive ? 'style="background:var(--active-glow);color:#000"' : ''}">${p.name[0].toUpperCase()}</div>
+            <div class="player-info">
+              <div class="player-name">${p.name} ${p.isActive ? '👑' : ''}</div>
+              <div class="player-meta">
+                ${t('obsessionX', {n: p.obsessionCount})}
+                ${sheet.obsession ? `<br><em style="font-size:0.75rem">${sheet.obsession} (Lv${sheet.obsessionLevel})</em>` : ''}
+                ${sheet.skills ? `<br><span style="font-size:0.75rem;color:var(--success)">${sheet.skills.join(' · ')}</span>` : ''}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div class="player-wp">${p.willpower}</div>
+              <div class="player-meta">${t('wpLabel')}</div>
+            </div>
+            <div class="player-actions">
+              <button class="btn btn-success btn-sm" onclick="markObsession('${id}')" title="Mark obsession complete">🏆</button>
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                <button class="btn btn-secondary btn-sm" style="padding:2px 6px;" onclick="adjustWP('${id}', 1)">+</button>
+                <button class="btn btn-secondary btn-sm" style="padding:2px 6px;" onclick="adjustWP('${id}', -1)">−</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">${t('gameLog')}</div>
+      <div class="game-log" id="game-log">${renderLog()}</div>
+    </div>
+
+    ${renderChatBox()}
+  </div>`;
+}
+
+function renderTiebreakPanel() {
+  const rs = S.roomState;
+  if (!rs?.tieBreakPlayers) return '';
+  const names = rs.tieBreakPlayers.map(id => ({ id, name: rs.players[id]?.name || id }));
+  return `
+  <div class="card" style="border-color:var(--accent3);">
+    <h2 style="color:#c792ff">${t('tiebreak')}</h2>
+    <p class="text-sm text-dim mb-2">${t('tiebreakDesc')}</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      ${names.map(p => `<button class="btn btn-secondary" onclick="resolveTiebreak('${p.id}')">${p.name}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ── Game: Player View ──────────────────────────────────────────────────────
+function renderPlayerGame() {
+  const rs = S.roomState;
+  const ch = S.character;
+  const me = rs?.players[S.playerId];
+  const isActive = rs?.activeVoice === S.playerId;
+  const phase = rs?.phase || 'playing';
+
+  if (!me || !ch) return `<div class="screen"><p class="text-dim text-center mt-3">${t('loading')}</p></div>`;
+
+  return `
+  <div class="screen">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
+      <h2 style="font-size:1rem;">${S.playerName} <span class="phase-badge ${phase}">${phase}</span></h2>
+      <span class="text-sm text-dim">Room: <strong class="text-accent2">${S.roomCode}</strong></span>
+    </div>
+
+    ${isActive ? `
+    <div class="active-voice-banner">
+      <div class="label">${t('youAre')}</div>
+      <div class="name">${t('theActiveVoice')}</div>
+    </div>` : rs?.activeVoice ? `
+    <div class="active-voice-banner" style="border-color:var(--border);">
+      <div class="label">${t('activeVoice')}</div>
+      <div class="name" style="color:var(--text);">${rs.activeVoiceName}</div>
+    </div>` : ''}
+
+    <div class="grid-2">
+      <div class="card" style="margin-bottom:0;">
+        <div class="section-title">${t('willpowerTitle')}</div>
+        <div class="wp-display">
+          <span class="wp-value">${me.willpower}</span>
+          <span class="wp-label">/ 10</span>
+        </div>
+        ${me.willpower === 0 ? `<p class="text-sm text-accent mt-1">${t('outOfWP')}</p>` : ''}
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="section-title">${t('obsessionX', {n: me.obsessionCount})}</div>
+        <div style="font-size:0.85rem;font-style:italic;color:var(--text-dim);">${ch.obsession}</div>
+        <div style="font-size:0.8rem;color:var(--accent2);margin-top:0.25rem;">${t('obsessionScore', {lvl: ch.obsessionLevel, count: me.obsessionCount, pts: ch.obsessionLevel * me.obsessionCount})}</div>
+      </div>
+    </div>
+
+    <div class="card mt-1">
+      <div class="section-title">${t('mySkills')}</div>
+      ${ch.skills.map(s => `<div style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.9rem;">✦ ${s}</div>`).join('')}
+    </div>
+
+    ${isActive && phase === 'playing' ? renderDiceSection() : ''}
+
+    <div class="card">
+      <div class="section-title">${t('allVoices')}</div>
+      <div class="player-list">
+        ${Object.entries(rs.players).filter(([,p]) => !p.isGM).map(([id, p]) => `
+          <div class="player-card ${p.isActive ? 'active' : ''}">
+            <div class="player-avatar">${p.name[0].toUpperCase()}</div>
+            <div class="player-info">
+              <div class="player-name">${p.name} ${id === S.playerId ? t('youLabel') : ''} ${p.isActive ? '👑' : ''}</div>
+              <div class="player-meta">${t('obsessionX', {n: p.obsessionCount})}</div>
+            </div>
+            <div class="player-wp">${p.willpower}<span style="font-size:0.7rem;color:var(--text-dim);"> ${t('wpLabel')}</span></div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">${t('gameLog')}</div>
+      <div class="game-log" id="game-log">${renderLog()}</div>
+    </div>
+
+    ${renderChatBox()}
+  </div>`;
+}
+
+function renderDiceSection() {
+  const lastDice = S.lastDice;
+  return `
+  <div class="card" style="border-color:var(--accent2);">
+    <h2>${t('rollDiceTitle')}</h2>
+    <p class="text-sm text-dim mb-2">${t('activeJohnDesc')}</p>
+    <div class="form-group">
+      <label>${t('hasSkillQ')}</label>
+      <div class="flex gap-2 mt-1">
+        <button class="btn ${S.rollHasSkill ? 'btn-success' : 'btn-ghost'}" onclick="setHasSkill(true)">${t('yesSkill')}</button>
+        <button class="btn ${S.rollHasSkill === false ? 'btn-primary' : 'btn-ghost'}" onclick="setHasSkill(false)">${t('noSkill')}</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>${t('spendWP')}</label>
+      <div class="bid-input-row" style="margin:0.5rem 0;">
+        <button onclick="adjustSpend(-1)" style="width:36px;height:36px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:1rem;cursor:pointer;">−</button>
+        <input type="number" id="wp-spend" value="${S.rollWPSpend || 0}" min="0" max="${S.roomState?.players[S.playerId]?.willpower || 0}"
+               style="width:70px;text-align:center;font-size:1.3rem;font-weight:700;background:var(--surface2);border:1px solid var(--accent2);border-radius:8px;color:var(--text);padding:0.4rem;" />
+        <button onclick="adjustSpend(1)" style="width:36px;height:36px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:1rem;cursor:pointer;">+</button>
+      </div>
+    </div>
+    <button class="btn btn-warning btn-full btn-lg" onclick="rollDice()">${t('rollBtn')}</button>
+    ${lastDice ? `
+    <div class="dice-result text-center mt-2">
+      <div class="dice-face">${diceFace(lastDice.rawRoll)}</div>
+      <div class="text-dim text-sm">
+        Roll: ${lastDice.rawRoll}${lastDice.willpowerSpent > 0 ? ` + ${lastDice.willpowerSpent} WP` : ''} = <strong>${lastDice.finalRoll}</strong>
+        (needed ${lastDice.threshold}${lastDice.hasSkill ? ` ${t('withSkill')}` : ` ${t('withoutSkill')}`})
+      </div>
+      <div class="result-label ${lastDice.success ? 'success' : 'failure'}" style="margin-top:0.5rem;">${lastDice.success ? t('rollSuccess') : t('rollFailure')}</div>
+    </div>` : ''}
+  </div>`;
+}
+
+function diceFace(n) {
+  return ['⚀','⚁','⚂','⚃','⚄','⚅'][n - 1] || '🎲';
+}
+
+// ── Bidding Overlay ────────────────────────────────────────────────────────
+function renderBiddingOverlay() {
+  const b = S.bidding;
+  if (!b.active) return '';
+
+  if (b.revealed && b.results) {
+    const { bids, winners, highest } = b.results;
+    return `
+    <div class="bidding-overlay">
+      <div class="bidding-modal">
+        <h2>${t('bidsRevealedTitle')}</h2>
+        <div class="reveal-grid">
+          ${Object.entries(bids).map(([id, bd]) => `
+            <div class="reveal-card ${winners.includes(id) ? 'winner' : ''}">
+              <div class="bid-amount">${bd.bid}</div>
+              <div class="bid-name">${bd.name} ${winners.includes(id) ? '👑' : ''}</div>
+            </div>`).join('')}
+        </div>
+        ${b.results.tieBreak ? `
+          <p class="text-dim text-sm mt-2">${t('tieAtN', {n: highest})}</p>
+          <p class="text-dim text-sm">${t('gmWillPick')}</p>` : `
+          <p style="color:var(--active-glow);font-weight:700;margin:0.75rem 0;">
+            ${S.roomState?.activeVoiceName || 'Someone'} ${t('takesControl')}
+          </p>`}
+        <button class="btn btn-primary mt-2" onclick="dismissBidResult()">${t('continueBtn')}</button>
+      </div>
+    </div>`;
+  }
+
+  if (b.submitted) {
+    const rs = S.roomState;
+    const readyCount = rs ? Object.values(rs.players).filter(p => !p.isGM && p.bidReady).length : 0;
+    const total = rs ? Object.values(rs.players).filter(p => !p.isGM).length : 0;
+    return `
+    <div class="bidding-overlay">
+      <div class="bidding-modal">
+        <h2>${t('bidSubmittedTitle')}</h2>
+        <div class="bid-wait">
+          <div class="checkmark">🤫</div>
+          <p class="mt-2">${t('bidLocked')}</p>
+          <p class="text-dim text-sm mt-1">${t('waitingOthers', {n: readyCount, total})}</p>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const maxBid = S.roomState?.players[S.playerId]?.willpower ?? 0;
+
+  return `
+  <div class="bidding-overlay">
+    <div class="bidding-modal">
+      <h2>${t('controlTestTitle')}</h2>
+      <div class="reason">${b.reason}</div>
+      <p class="text-sm text-dim mb-2">${t('bidInstructions')}</p>
+      <div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.5rem;">${t('yourWillpower')} <strong style="color:var(--accent2)">${maxBid}</strong></div>
+      <div class="bid-input-row">
+        <div class="bid-stepper">
+          <button onclick="adjBid(1)">▲</button>
+          <button onclick="adjBid(-1)">▼</button>
+        </div>
+        <input type="number" id="bid-val" value="${b.myBid || 0}" min="0" max="${maxBid}"
+               oninput="updateBid(this.value)" />
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:1rem;">${t('bidZero')}</div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="submitBid()">${t('lockInBid')}</button>
+    </div>
+  </div>`;
+}
+
+// ── Scoring ────────────────────────────────────────────────────────────────
+function renderScoring() {
+  const scores = S.scores;
+  const isGM = S.role === 'gm';
+
+  return `
+  <div class="screen">
+    <div class="app-header">
+      <h1>${t('gameOverTitle')}</h1>
+      <p>${t('johnSleep')}</p>
+    </div>
+
+    ${scores ? `
+    <div class="card">
+      <h2>${t('finalScores')}</h2>
+      ${scores.map((p, i) => `
+        <div class="score-card ${i === 0 ? 'winner-card' : ''}">
+          <div class="score-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`}</div>
+          <div class="score-info">
+            <div class="score-name">${p.name} ${i === 0 ? t('nextGM') : ''}</div>
+            <div class="score-obsession">"${p.obsession}"</div>
+            <div class="score-skills">${p.skills.join(' · ')}</div>
+          </div>
+          <div>
+            <div class="score-points">${p.score}</div>
+            <div class="score-breakdown">${p.obsessionCount}×${p.obsessionLevel}</div>
+          </div>
+        </div>`).join('')}
+    </div>` : `
+    <div class="card text-center">
+      ${isGM ? `
+        <p class="text-dim mb-2">${t('revealHint')}</p>
+        <button class="btn btn-primary btn-lg" onclick="revealScores()">${t('revealScores')}</button>` : `
+        <p class="text-dim">${t('waitingScores')}</p>`}
+    </div>`}
+
+    <div class="card">
+      <div class="section-title">${t('gameLog')}</div>
+      <div class="game-log" id="game-log">${renderLog()}</div>
+    </div>
+
+    <div class="card text-center">
+      <button class="btn btn-ghost btn-full" onclick="location.reload()">${t('playAgain')}</button>
+    </div>
+  </div>`;
+}
+
+// ── Chat ───────────────────────────────────────────────────────────────────
+function renderChatBox() {
+  return `
+  <div class="card">
+    <div class="section-title">${t('chat')}</div>
+    <div class="chat-log" id="chat-log">${renderChatMessages()}</div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="${t('sayHere')}" maxlength="200" />
+      <button onclick="sendChat()">${t('send')}</button>
+    </div>
+  </div>`;
+}
+
+function renderChatMessages() {
+  if (S.chat.length === 0) return `<span style="color:var(--text-dim);font-size:0.8rem;">${t('noMsgsYet')}</span>`;
+  return S.chat.map(m => `
+    <div class="chat-msg ${m.isGM ? 'is-gm' : ''} ${m.name === S.playerName ? 'is-me' : ''}">
+      <span class="chat-who">${m.isGM ? '🎭 ' : ''}${m.name}:</span>
+      <span class="chat-text"> ${m.text}</span>
+    </div>`).join('');
+}
+
+// ── Log renderer ───────────────────────────────────────────────────────────
+function renderLog() {
+  return S.log.map(e =>
+    `<div class="log-entry ${e.type}">${e.message}</div>`
+  ).join('');
+}
+
+// ── Main game dispatcher ───────────────────────────────────────────────────
+function renderGame() {
+  const overlay = renderBiddingOverlay();
+  const main = S.role === 'gm' ? renderGMGame() : renderPlayerGame();
+  return main + overlay;
+}
+
+// ── Event handlers ─────────────────────────────────────────────────────────
+function attachHandlers() {
+  const chatInput = document.getElementById('chat-input');
+  if (chatInput) chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+}
+
+function createRoom() {
+  const name = document.getElementById('gm-name')?.value.trim();
+  if (!name) return toast(t('enterName'), 'error');
+  S.playerName = name;
+  socket.emit('create-room', { gmName: name });
+}
+
+function joinRoom() {
+  const name = document.getElementById('player-name')?.value.trim();
+  const code = document.getElementById('room-code-input')?.value.trim().toUpperCase();
+  if (!name) return toast(t('enterName'), 'error');
+  if (!code || code.length !== 4) return toast(t('enterCode'), 'error');
+  S.playerName = name;
+  socket.emit('join-room', { code, playerName: name });
+}
+
+function goToCharacter() {
+  S.view = 'character';
+  S.character = S.character || { skills: ['', ''], obsession: '', obsessionLevel: 1, willpowerStart: 10 };
+  render();
+}
+
+function saveCharacterFormState() {
+  if (!S.character) return;
+  const skillInputs = document.querySelectorAll('.skill-input');
+  if (skillInputs.length > 0) S.character.skills = Array.from(skillInputs).map(i => i.value);
+  const obsInput = document.getElementById('obsession-input');
+  if (obsInput) S.character.obsession = obsInput.value;
+}
+
+function setWPStart(wp) {
+  saveCharacterFormState();
+  if (!S.character) S.character = {};
+  const existing = S.character.skills || [];
+  S.character.willpowerStart = wp;
+  S.character.skills = wp === 7 ? [existing[0]||'', existing[1]||'', existing[2]||''] : [existing[0]||'', existing[1]||''];
+  S.view = 'character';
+  render();
+}
+
+function setLevel(l) {
+  saveCharacterFormState();
+  if (!S.character) S.character = {};
+  S.character.obsessionLevel = l;
+  render();
+}
+
+function backToLobby() {
+  S.view = 'lobby';
+  render();
+}
+
+function submitCharacter() {
+  const skills = Array.from(document.querySelectorAll('.skill-input')).map(i => i.value.trim()).filter(Boolean);
+  const obsession = document.getElementById('obsession-input')?.value.trim();
+  const level = S.character?.obsessionLevel || 1;
+  const wp = S.character?.willpowerStart || 10;
+  const expected = wp === 7 ? 3 : 2;
+
+  if (skills.length < expected) return toast(t('enterSkills', {n: expected}), 'error');
+  if (!obsession) return toast(t('enterObsession'), 'error');
+
+  S.character = { skills, obsession, obsessionLevel: level, willpowerStart: wp };
+  S.characterPending = true;
+  S.characterApproved = false;
+  S.rejectionReason = null;
+  socket.emit('submit-character', { skills, obsession, obsessionLevel: level, willpowerStart: wp });
+  toast(t('toastCharLocked'), 'info');
+  S.view = 'lobby';
+  render();
+}
+
+function startGame() {
+  socket.emit('start-game');
+}
+
+function gmTrigger(reason) {
+  socket.emit('trigger-control-test', { reason });
+}
+
+function showCustomTrigger() {
+  const row = document.getElementById('custom-trigger-row');
+  if (row) row.classList.toggle('hidden');
+}
+
+function gmCustomTrigger() {
+  const val = document.getElementById('custom-trigger-input')?.value.trim();
+  if (!val) return;
+  socket.emit('trigger-control-test', { reason: val });
+}
+
+function johnNap() {
+  socket.emit('john-nap');
+}
+
+function forceReveal() {
+  socket.emit('force-reveal-bids');
+}
+
+function endGame() {
+  if (confirm(t('confirmEndGame'))) socket.emit('end-game');
+}
+
+function markObsession(playerId) {
+  socket.emit('complete-obsession', { playerId });
+}
+
+function adjustWP(playerId, delta) {
+  socket.emit('adjust-willpower', { playerId, delta });
+}
+
+function approveCharacter(playerId) {
+  socket.emit('approve-character', { playerId });
+}
+
+function rejectCharacter(playerId) {
+  const reason = document.getElementById(`reject-reason-${playerId}`)?.value.trim() || '';
+  socket.emit('reject-character', { playerId, reason });
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  socket.emit('chat-message', { text });
+  input.value = '';
+}
+
+function resolveTiebreak(winnerId) {
+  socket.emit('resolve-tiebreak', { winnerId });
+}
+
+function revealScores() {
+  socket.emit('reveal-scores');
+}
+
+// Bidding
+function updateBid(val) {
+  const max = S.roomState?.players[S.playerId]?.willpower || 0;
+  S.bidding.myBid = Math.max(0, Math.min(parseInt(val) || 0, max));
+  const el = document.getElementById('bid-val');
+  if (el) el.value = S.bidding.myBid;
+}
+
+function adjBid(delta) {
+  const max = S.roomState?.players[S.playerId]?.willpower || 0;
+  S.bidding.myBid = Math.max(0, Math.min((S.bidding.myBid || 0) + delta, max));
+  const el = document.getElementById('bid-val');
+  if (el) el.value = S.bidding.myBid;
+}
+
+function submitBid() {
+  socket.emit('submit-bid', { amount: S.bidding.myBid || 0 });
+}
+
+function dismissBidResult() {
+  S.bidding.active = false;
+  S.bidding.revealed = false;
+  S.bidding.results = null;
+  render();
+}
+
+// Dice
+let S_rollHasSkill = null;
+let S_rollWPSpend = 0;
+Object.defineProperty(S, 'rollHasSkill', { get: () => S_rollHasSkill, set: v => { S_rollHasSkill = v; } });
+Object.defineProperty(S, 'rollWPSpend', { get: () => S_rollWPSpend, set: v => { S_rollWPSpend = v; } });
+
+function setHasSkill(val) {
+  S.rollHasSkill = val;
+  render();
+}
+
+function adjustSpend(delta) {
+  const max = S.roomState?.players[S.playerId]?.willpower || 0;
+  S.rollWPSpend = Math.max(0, Math.min((S.rollWPSpend || 0) + delta, max));
+  const el = document.getElementById('wp-spend');
+  if (el) el.value = S.rollWPSpend;
+}
+
+function rollDice() {
+  if (S.rollHasSkill === null) return toast(t('selectSkill'), 'error');
+  const spend = parseInt(document.getElementById('wp-spend')?.value) || 0;
+  S.rollWPSpend = spend;
+  socket.emit('roll-dice', { willpowerSpent: spend, hasSkill: S.rollHasSkill });
+}
+
+function copyCode() {
+  if (!S.roomCode) return;
+  navigator.clipboard.writeText(S.roomCode).then(() => toast(t('copied'), 'success'));
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ── Socket events ──────────────────────────────────────────────────────────
+socket.on('room-created', ({ code, playerId }) => {
+  S.playerId = playerId;
+  S.roomCode = code;
+  S.role = 'gm';
+  S.view = 'lobby';
+  render();
+  toast(t('toastRoomCreated', {code}), 'success');
+});
+
+socket.on('room-joined', ({ code, playerId }) => {
+  S.playerId = playerId;
+  S.roomCode = code;
+  S.role = 'player';
+  S.view = 'lobby';
+  render();
+  toast(t('toastJoined', {code}), 'success');
+});
+
+socket.on('room-state', (state) => {
+  S.roomState = state;
+  if (S.view === 'game' || S.view === 'lobby') render();
+});
+
+socket.on('game-started', () => {
+  S.view = 'game';
+  render();
+  toast(t('toastGameStarted'), 'info');
+});
+
+socket.on('control-test-started', ({ reason }) => {
+  S.bidding.active = true;
+  S.bidding.reason = reason;
+  S.bidding.submitted = false;
+  S.bidding.revealed = false;
+  S.bidding.myBid = 0;
+  S.bidding.results = null;
+  if (S.view === 'game') render();
+});
+
+socket.on('bid-submitted', ({ amount }) => {
+  S.bidding.submitted = true;
+  if (S.view === 'game') render();
+});
+
+socket.on('bids-revealed', ({ bids, winners, highest, newActive, tieBreak }) => {
+  S.bidding.revealed = true;
+  S.bidding.submitted = false;
+  S.bidding.results = { bids, winners, highest, newActive, tieBreak };
+  if (S.view === 'game') render();
+});
+
+socket.on('tiebreak-resolved', ({ winnerId, winnerName }) => {
+  toast(t('toastTiebreak', {name: winnerName}), 'success');
+  S.bidding.active = false;
+  S.bidding.revealed = false;
+  if (S.view === 'game') render();
+});
+
+socket.on('dice-rolled', ({ playerId, playerName, rawRoll, willpowerSpent, finalRoll, threshold, hasSkill, success }) => {
+  S.lastDice = { rawRoll, willpowerSpent, finalRoll, threshold, hasSkill, success };
+  if (S.view === 'game') render();
+  if (playerId !== S.playerId) {
+    toast(t(success ? 'toastSuccess' : 'toastFailure', {name: playerName, n: finalRoll}), success ? 'success' : 'error');
+  }
+});
+
+socket.on('obsession-completed', ({ playerName, count }) => {
+  toast(t('toastObsession', {name: playerName, n: count}), 'success');
+});
+
+socket.on('john-napped', ({ roll, slept }) => {
+  if (slept) {
+    toast(t('toastNapped', {n: roll}), 'info');
+  } else {
+    toast(t('toastAwake', {n: roll}), 'info');
+  }
+});
+
+socket.on('log', ({ message, type }) => {
+  S.log.unshift({ message, type });
+  if (S.log.length > 100) S.log.pop();
+  const el = document.getElementById('game-log');
+  if (el) el.innerHTML = renderLog();
+});
+
+socket.on('game-over', ({ reason }) => {
+  S.view = 'scoring';
+  S.scores = null;
+  render();
+  toast(t(reason === 'willpower' ? 'toastGameOverWP' : 'toastGameOverGM'), 'info');
+});
+
+socket.on('scores-revealed', ({ scores }) => {
+  S.scores = scores;
+  if (S.view === 'scoring') render();
+  toast(t('toastScores'), 'success');
+});
+
+socket.on('player-left', ({ name }) => {
+  toast(t('toastLeft', {name}), 'info');
+});
+
+socket.on('gm-disconnected', () => {
+  toast(t('toastGMDC'), 'error');
+  setTimeout(() => location.reload(), 3000);
+});
+
+socket.on('gm-player-sheet', (sheet) => {
+  S.gmSheets[sheet.playerId] = sheet;
+  if (S.view === 'game' || S.view === 'lobby') render();
+});
+
+socket.on('character-saved', (ch) => {
+  if (S.character) {
+    Object.assign(S.character, ch);
+  }
+});
+
+socket.on('character-approved', () => {
+  S.characterPending = false;
+  S.characterApproved = true;
+  S.rejectionReason = null;
+  toast(t('toastApproved'), 'success');
+  if (S.view === 'lobby') render();
+});
+
+socket.on('character-rejected', ({ reason }) => {
+  S.characterPending = false;
+  S.characterApproved = false;
+  S.rejectionReason = reason || '';
+  toast(t('toastRejected'), 'error');
+  if (S.view === 'lobby') render();
+});
+
+socket.on('chat-message', (msg) => {
+  S.chat.push(msg);
+  if (S.chat.length > 200) S.chat.shift();
+  const log = document.getElementById('chat-log');
+  if (log) {
+    log.innerHTML = renderChatMessages();
+    log.scrollTop = log.scrollHeight;
+  }
+});
+
+socket.on('error', ({ message }) => {
+  toast(message, 'error');
+});
+
+// ── Init ───────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
