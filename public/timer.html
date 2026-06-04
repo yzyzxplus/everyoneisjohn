@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>举手计时器 — IE工具箱</title>
+  <style>
+    :root {
+      --primary:       #1565c0;
+      --primary-light: #1e88e5;
+      --primary-dark:  #0d47a1;
+      --success:       #2e7d32;
+      --warning:       #e65100;
+      --bg:            #f0f4f8;
+      --surface:       #ffffff;
+      --text:          #212121;
+      --text-dim:      #757575;
+      --border:        #e0e0e0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--primary);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    }
+    .header-icon { font-size: 1.8rem; line-height: 1; }
+    .header-text h1 { font-size: 1.25rem; font-weight: 700; }
+    .header-text p  { font-size: 0.78rem; opacity: .8; margin-top: .1rem; }
+
+    /* ── Timer card ── */
+    .timer-card {
+      background: var(--surface);
+      margin: 1rem;
+      border-radius: 14px;
+      padding: 1.5rem 1rem 1.25rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .timer-display {
+      font-size: clamp(2.8rem, 12vw, 4.5rem);
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: .04em;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .timer-display.running { color: var(--success); }
+    .timer-display.done    { color: var(--text-dim); }
+
+    .progress-bar-wrap {
+      margin: .8rem .5rem .5rem;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary-light), var(--success));
+      border-radius: 3px;
+      transition: width .3s;
+    }
+    .progress-text {
+      font-size: .85rem;
+      color: var(--text-dim);
+      margin-top: .4rem;
+    }
+
+    /* ── Control buttons ── */
+    .controls {
+      display: flex;
+      gap: .6rem;
+      margin: 0 1rem .9rem;
+    }
+    .btn {
+      flex: 1;
+      padding: .85rem .5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter .12s, transform .1s;
+      min-height: 50px;
+      font-family: inherit;
+    }
+    .btn:active { transform: scale(.96); }
+    .btn-start  { background: var(--primary); color: #fff; }
+    .btn-start:disabled { background: #90caf9; cursor: not-allowed; transform: none; }
+    .btn-undo   { background: #ff8f00; color: #fff; }
+    .btn-undo:disabled  { background: var(--border); color: var(--text-dim); cursor: not-allowed; transform: none; }
+    .btn-reset  { background: #eceff1; color: var(--text); }
+
+    /* ── Worker grid ── */
+    .workers-section { margin: 0 1rem .9rem; }
+    .section-label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-dim);
+      margin-bottom: .6rem;
+    }
+    .workers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .55rem;
+    }
+    @media (min-width: 420px) { .workers-grid { grid-template-columns: repeat(5, 1fr); } }
+
+    .worker-btn {
+      background: var(--surface);
+      border: 2px solid #bbdefb;
+      border-radius: 12px;
+      padding: .9rem .4rem;
+      cursor: pointer;
+      transition: all .13s;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .25rem;
+      font-family: inherit;
+      touch-action: manipulation;
+    }
+    .worker-btn:disabled { cursor: not-allowed; }
+    .worker-btn.idle  { border-color: var(--border); background: #fafafa; }
+    .worker-btn.ready { border-color: var(--primary); background: #e3f2fd; }
+    .worker-btn.ready:active { transform: scale(.94); background: #bbdefb; }
+    .worker-btn.recorded {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    .wnum  { font-size: 1.7rem; font-weight: 700; line-height: 1; color: inherit; }
+    .wlabel {
+      font-size: .68rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+    .worker-btn.recorded .wlabel { color: rgba(255,255,255,.8); }
+    .wtime {
+      font-size: .78rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-dim);
+    }
+    .worker-btn.recorded .wtime { color: rgba(255,255,255,.9); }
+
+    /* ── Results table ── */
+    .results-section {
+      margin: 0 1rem 2rem;
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      display: none;
+    }
+    .results-section.visible { display: block; }
+
+    .results-head {
+      background: var(--primary-dark);
+      color: #fff;
+      padding: .7rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .results-head h2 { font-size: .95rem; }
+
+    .btn-copy {
+      background: rgba(255,255,255,.2);
+      color: #fff;
+      border: none;
+      padding: .3rem .85rem;
+      border-radius: 6px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-copy:active { background: rgba(255,255,255,.35); }
+
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th {
+      background: #e3f2fd;
+      padding: .55rem .8rem;
+      text-align: left;
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: .78rem;
+    }
+    td {
+      padding: .55rem .8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr.summary-row td {
+      background: #f5f5f5;
+      font-weight: 600;
+      color: var(--text-dim);
+      font-size: .82rem;
+    }
+    td.rank-col { font-weight: 700; color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-icon">✋</div>
+    <div class="header-text">
+      <h1>举手计时器</h1>
+      <p>服装厂IE工具箱 · 记录10人举手顺序与反应时间</p>
+    </div>
+  </div>
+
+  <!-- Timer display -->
+  <div class="timer-card">
+    <div id="timerDisplay" class="timer-display">00:00.00</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">等待开始 · 共 10 人</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button id="startBtn" class="btn btn-start" onclick="startTimer()">开始计时</button>
+    <button id="undoBtn"  class="btn btn-undo"  onclick="undoLast()" disabled>撤销</button>
+    <button id="resetBtn" class="btn btn-reset" onclick="resetAll()">重置</button>
+  </div>
+
+  <!-- Worker grid -->
+  <div class="workers-section">
+    <div class="section-label">点击对应工人的格子记录举手时间</div>
+    <div class="workers-grid" id="workersGrid"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-section" id="resultsSection">
+    <div class="results-head">
+      <h2>📊 计时结果</h2>
+      <button class="btn-copy" onclick="copyResults()">复制数据</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>顺序</th>
+          <th>工人</th>
+          <th>举手时间</th>
+          <th>间隔</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const TOTAL = 10;
+    let startTime = null;
+    let rafId    = null;
+    let records  = []; // {id, rank, elapsed}
+    let status   = 'idle'; // idle | running | done
+
+    /* ── Build worker buttons ── */
+    function buildGrid() {
+      const grid = document.getElementById('workersGrid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= TOTAL; i++) {
+        const btn = document.createElement('button');
+        btn.id        = `w-${i}`;
+        btn.className = 'worker-btn idle';
+        btn.disabled  = true;
+        btn.innerHTML = workerHTML(i, '—', '');
+        btn.addEventListener('click', () => recordWorker(i));
+        grid.appendChild(btn);
+      }
+    }
+
+    function workerHTML(id, timeStr, rankStr) {
+      return `<span class="wnum">${id}</span>
+              <span class="wlabel">${rankStr || ('工人 ' + id)}</span>
+              <span class="wtime">${timeStr}</span>`;
+    }
+
+    /* ── Timer loop ── */
+    function tick() {
+      if (status !== 'running') return;
+      const el = performance.now() - startTime;
+      document.getElementById('timerDisplay').textContent = fmt(el);
+      rafId = requestAnimationFrame(tick);
+    }
+
+    /* ── Start ── */
+    function startTimer() {
+      if (status !== 'idle') return;
+      startTime = performance.now();
+      status    = 'running';
+
+      document.getElementById('timerDisplay').classList.add('running');
+      document.getElementById('startBtn').disabled    = true;
+      document.getElementById('startBtn').textContent = '计时中…';
+      document.getElementById('progressText').textContent = `0 / ${TOTAL} 人已举手`;
+
+      for (let i = 1; i <= TOTAL; i++) {
+        const b = document.getElementById(`w-${i}`);
+        b.disabled  = false;
+        b.className = 'worker-btn ready';
+      }
+
+      rafId = requestAnimationFrame(tick);
+    }
+
+    /* ── Record a worker ── */
+    function recordWorker(id) {
+      if (status !== 'running') return;
+      if (records.find(r => r.id === id)) return;
+
+      const elapsed = performance.now() - startTime;
+      const rank    = records.length + 1;
+      records.push({ id, rank, elapsed });
+
+      const btn = document.getElementById(`w-${id}`);
+      btn.className = 'worker-btn recorded';
+      btn.disabled  = true;
+      btn.innerHTML = workerHTML(id, fmt(elapsed), `第 ${rank} 位`);
+
+      document.getElementById('undoBtn').disabled = false;
+      document.getElementById('progressText').textContent = `${rank} / ${TOTAL} 人已举手`;
+      document.getElementById('progressBar').style.width  = `${rank / TOTAL * 100}%`;
+
+      renderTable();
+
+      if (rank === TOTAL) finishTimer(elapsed);
+    }
+
+    /* ── Finish ── */
+    function finishTimer(elapsed) {
+      status = 'done';
+      cancelAnimationFrame(rafId);
+      const disp = document.getElementById('timerDisplay');
+      disp.classList.remove('running');
+      disp.classList.add('done');
+      disp.textContent = fmt(elapsed);
+      document.getElementById('progressText').textContent =
+        `全部完成！总用时 ${fmt(elapsed)}`;
+    }
+
+    /* ── Undo last record ── */
+    function undoLast() {
+      if (!records.length) return;
+      const last = records.pop();
+
+      const btn = document.getElementById(`w-${last.id}`);
+      btn.className = 'worker-btn ready';
+      btn.disabled  = false;
+      btn.innerHTML = workerHTML(last.id, '—', '');
+
+      if (status === 'done') {
+        status = 'running';
+        document.getElementById('timerDisplay').classList.remove('done');
+        document.getElementById('timerDisplay').classList.add('running');
+        rafId = requestAnimationFrame(tick);
+      }
+
+      const n = records.length;
+      document.getElementById('progressText').textContent = `${n} / ${TOTAL} 人已举手`;
+      document.getElementById('progressBar').style.width  = `${n / TOTAL * 100}%`;
+      document.getElementById('undoBtn').disabled = n === 0;
+
+      renderTable();
+    }
+
+    /* ── Reset ── */
+    function resetAll() {
+      if (status === 'running' && records.length > 0) {
+        if (!confirm('确认重置？当前计时数据将丢失。')) return;
+      }
+
+      cancelAnimationFrame(rafId);
+      startTime = null;
+      records   = [];
+      status    = 'idle';
+
+      const disp = document.getElementById('timerDisplay');
+      disp.textContent = '00:00.00';
+      disp.className   = 'timer-display';
+
+      document.getElementById('progressBar').style.width        = '0%';
+      document.getElementById('progressText').textContent       = `等待开始 · 共 ${TOTAL} 人`;
+      document.getElementById('startBtn').disabled              = false;
+      document.getElementById('startBtn').textContent           = '开始计时';
+      document.getElementById('undoBtn').disabled               = true;
+      document.getElementById('resultsSection').classList.remove('visible');
+
+      buildGrid();
+    }
+
+    /* ── Render results table ── */
+    function renderTable() {
+      if (!records.length) {
+        document.getElementById('resultsSection').classList.remove('visible');
+        return;
+      }
+
+      document.getElementById('resultsSection').classList.add('visible');
+      const tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = '';
+
+      const sorted = [...records].sort((a, b) => a.rank - b.rank);
+      let totalInterval = 0;
+
+      sorted.forEach((r, i) => {
+        const prev     = sorted[i - 1];
+        const interval = prev ? r.elapsed - prev.elapsed : null;
+        if (interval !== null) totalInterval += interval;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="rank-col">第 ${r.rank} 位</td>
+          <td>工人 ${r.id}</td>
+          <td>${fmt(r.elapsed)}</td>
+          <td>${interval !== null ? fmtDelta(interval) : '—'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (sorted.length >= 2) {
+        const avg = totalInterval / (sorted.length - 1);
+        const tr  = document.createElement('tr');
+        tr.className = 'summary-row';
+        tr.innerHTML = `<td colspan="3">平均间隔</td><td>${fmtDelta(avg)}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    /* ── Copy to clipboard (tab-separated for Excel) ── */
+    function copyResults() {
+      if (!records.length) return;
+      const sorted = [...records].sort((a, b) => a.rank - b.rank);
+      let text = '顺序\t工人编号\t举手时间\t间隔时间\n';
+      sorted.forEach((r, i) => {
+        const prev     = sorted[i - 1];
+        const interval = prev ? fmtDelta(r.elapsed - prev.elapsed) : '—';
+        text += `第${r.rank}位\t工人${r.id}\t${fmt(r.elapsed)}\t${interval}\n`;
+      });
+
+      const writeText = (t) => {
+        if (navigator.clipboard?.writeText) {
+          return navigator.clipboard.writeText(t);
+        }
+        const ta = document.createElement('textarea');
+        ta.value = t;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        return Promise.resolve();
+      };
+
+      const btn = document.querySelector('.btn-copy');
+      writeText(text).then(() => {
+        btn.textContent = '✓ 已复制';
+        setTimeout(() => { btn.textContent = '复制数据'; }, 2000);
+      });
+    }
+
+    /* ── Formatters ── */
+    function fmt(ms) {
+      const m  = Math.floor(ms / 60000);
+      const s  = Math.floor((ms % 60000) / 1000);
+      const cs = Math.floor((ms % 1000) / 10);
+      return `${pad(m)}:${pad(s)}.${pad(cs)}`;
+    }
+
+    function fmtDelta(ms) {
+      return ms < 1000
+        ? `+${Math.round(ms)} ms`
+        : `+${(ms / 1000).toFixed(2)} s`;
+    }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    /* ── Init ── */
+    buildGrid();
+  </script>
+</body>
+</html>
