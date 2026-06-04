@@ -1,0 +1,14 @@
+[build]
+  publish = "public"
+
+# Redirect site root to the timer
+[[redirects]]
+  from   = "/"
+  to     = "/timer.html"
+  status = 302
+
+# Prevent 404 on direct /timer URL (no extension)
+[[redirects]]
+  from   = "/timer"
+  to     = "/timer.html"
+  status = 200
